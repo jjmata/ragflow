@@ -36,3 +36,6 @@ sdk/python/ragflow.egg-info/
 sdk/python/build/
 sdk/python/dist/
 sdk/python/ragflow_sdk.egg-info/
+
+# Exclude Ollama generated files
+ollama-data
