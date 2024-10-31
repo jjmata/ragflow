@@ -266,6 +266,12 @@
                     "tags": "LLM,CHAT",
                     "max_tokens": 128000,
                     "model_type": "chat"
+                },
+                {
+                    "llm_name": "moonshot-v1-auto",
+                    "tags": "LLM,CHAT,",
+                    "max_tokens": 128000,
+                    "model_type": "chat"
                 }
             ]
         },
@@ -2115,6 +2121,12 @@
             "tags": "LLM,IMAGE2TEXT",
             "status": "1",
             "llm": [
+                {
+                    "llm_name": "yi-lightning",
+                    "tags": "LLM,CHAT,16k",
+                    "max_tokens": 16384,
+                    "model_type": "chat"
+                },
                 {
                     "llm_name": "yi-large",
                     "tags": "LLM,CHAT,32k",

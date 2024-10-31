@@ -48,14 +48,9 @@ import os
 
 MAXIMUM_OF_UPLOADING_FILES = 256
 
-MAXIMUM_OF_UPLOADING_FILES = 256
-
-MAXIMUM_OF_UPLOADING_FILES = 256
-
-MAXIMUM_OF_UPLOADING_FILES = 256
 
 
-@manager.route('/dataset/<dataset_id>/document', methods=['POST'])
+@manager.route('/datasets/<dataset_id>/documents', methods=['POST'])
 @token_required
 def upload(dataset_id, tenant_id):
     if 'file' not in request.files:
@@ -103,7 +98,7 @@ def upload(dataset_id, tenant_id):
     return get_result(data=renamed_doc_list)
 
 
-@manager.route('/dataset/<dataset_id>/info/<document_id>', methods=['PUT'])
+@manager.route('/datasets/<dataset_id>/documents/<document_id>', methods=['PUT'])
 @token_required
 def update_doc(tenant_id, dataset_id, document_id):
     req = request.json
@@ -158,6 +153,7 @@ def update_doc(tenant_id, dataset_id, document_id):
         if not e:
             return get_error_data_result(retmsg="Document not found!")
         req["parser_config"] = get_parser_config(req["chunk_method"], req.get("parser_config"))
+        DocumentService.update_parser_config(doc.id, req["parser_config"])
         if doc.token_num > 0:
             e = DocumentService.increment_chunk_num(doc.id, doc.kb_id, doc.token_num * -1, doc.chunk_num * -1,
                                                     doc.process_duation * -1)
@@ -169,7 +165,7 @@ def update_doc(tenant_id, dataset_id, document_id):
     return get_result()
 
 
-@manager.route('/dataset/<dataset_id>/document/<document_id>', methods=['GET'])
+@manager.route('/datasets/<dataset_id>/documents/<document_id>', methods=['GET'])
 @token_required
 def download(tenant_id, dataset_id, document_id):
     if not KnowledgebaseService.query(id=dataset_id, tenant_id=tenant_id):
@@ -192,7 +188,7 @@ def download(tenant_id, dataset_id, document_id):
     )
 
 
-@manager.route('/dataset/<dataset_id>/info', methods=['GET'])
+@manager.route('/datasets/<dataset_id>/documents', methods=['GET'])
 @token_required
 def list_docs(dataset_id, tenant_id):
     if not KnowledgebaseService.query(id=dataset_id, tenant_id=tenant_id):
@@ -228,15 +224,15 @@ def list_docs(dataset_id, tenant_id):
         }
         renamed_doc = {}
         for key, value in doc.items():
-            if key =="run":
-                renamed_doc["run"]=run_mapping.get(str(value))
             new_key = key_mapping.get(key, key)
             renamed_doc[new_key] = value
+            if key =="run":
+                renamed_doc["run"]=run_mapping.get(value)
         renamed_doc_list.append(renamed_doc)
     return get_result(data={"total": tol, "docs": renamed_doc_list})
 
 
-@manager.route('/dataset/<dataset_id>/document', methods=['DELETE'])
+@manager.route('/datasets/<dataset_id>/documents', methods=['DELETE'])
 @token_required
 def delete(tenant_id,dataset_id):
     if not KnowledgebaseService.query(id=dataset_id, tenant_id=tenant_id):
@@ -286,7 +282,7 @@ def delete(tenant_id,dataset_id):
     return get_result()
 
 
-@manager.route('/dataset/<dataset_id>/chunk', methods=['POST'])
+@manager.route('/datasets/<dataset_id>/chunks', methods=['POST'])
 @token_required
 def parse(tenant_id,dataset_id):
     if not KnowledgebaseService.query(id=dataset_id, tenant_id=tenant_id):
@@ -298,14 +294,11 @@ def parse(tenant_id,dataset_id):
         doc = DocumentService.query(id=id,kb_id=dataset_id)
         if not doc:
             return get_error_data_result(retmsg=f"You don't own the document {id}.")
-        if doc[0].progress != 0.0:
-            return get_error_data_result("Can't stop parsing document with progress at 0 or 100")
         info = {"run": "1", "progress": 0}
         info["progress_msg"] = ""
         info["chunk_num"] = 0
         info["token_num"] = 0
         DocumentService.update_by_id(id, info)
-        # if str(req["run"]) == TaskStatus.CANCEL.value:
         ELASTICSEARCH.deleteByQuery(
             Q("match", doc_id=id), idxnm=search.index_name(tenant_id))
         TaskService.filter_delete([Task.doc_id == id])
@@ -316,7 +309,7 @@ def parse(tenant_id,dataset_id):
         queue_tasks(doc, bucket, name)
     return get_result()
 
-@manager.route('/dataset/<dataset_id>/chunk', methods=['DELETE'])
+@manager.route('/datasets/<dataset_id>/chunks', methods=['DELETE'])
 @token_required
 def stop_parsing(tenant_id,dataset_id):
     if not KnowledgebaseService.query(id=dataset_id, tenant_id=tenant_id):
@@ -330,16 +323,14 @@ def stop_parsing(tenant_id,dataset_id):
             return get_error_data_result(retmsg=f"You don't own the document {id}.")
         if doc[0].progress == 100.0 or doc[0].progress == 0.0:
             return get_error_data_result("Can't stop parsing document with progress at 0 or 100")
-        info = {"run": "2", "progress": 0}
+        info = {"run": "2", "progress": 0,"chunk_num":0}
         DocumentService.update_by_id(id, info)
-        # if str(req["run"]) == TaskStatus.CANCEL.value:
-        tenant_id = DocumentService.get_tenant_id(id)
         ELASTICSEARCH.deleteByQuery(
             Q("match", doc_id=id), idxnm=search.index_name(tenant_id))
     return get_result()
 
 
-@manager.route('/dataset/<dataset_id>/document/<document_id>/chunk', methods=['GET'])
+@manager.route('/datasets/<dataset_id>/documents/<document_id>/chunks', methods=['GET'])
 @token_required
 def list_chunks(tenant_id,dataset_id,document_id):
     if not KnowledgebaseService.query(id=dataset_id, tenant_id=tenant_id):
@@ -373,10 +364,10 @@ def list_chunks(tenant_id,dataset_id,document_id):
     doc=doc.to_dict()
     renamed_doc = {}
     for key, value in doc.items():
-        if key == "run":
-            renamed_doc["run"] = run_mapping.get(str(value))
         new_key = key_mapping.get(key, key)
         renamed_doc[new_key] = value
+        if key == "run":
+            renamed_doc["run"] = run_mapping.get(str(value))
     res = {"total": sres.total, "chunks": [], "doc": renamed_doc}
     origin_chunks = []
     sign = 0
@@ -416,18 +407,23 @@ def list_chunks(tenant_id,dataset_id,document_id):
             "content_with_weight": "content",
             "doc_id": "document_id",
             "important_kwd": "important_keywords",
-            "img_id": "image_id"
+            "img_id": "image_id",
+            "available_int":"available"
         }
         renamed_chunk = {}
         for key, value in chunk.items():
             new_key = key_mapping.get(key, key)
             renamed_chunk[new_key] = value
+        if renamed_chunk["available"] == "0":
+            renamed_chunk["available"] = False
+        if renamed_chunk["available"] == "1":
+            renamed_chunk["available"] = True
         res["chunks"].append(renamed_chunk)
     return get_result(data=res)
 
 
 
-@manager.route('/dataset/<dataset_id>/document/<document_id>/chunk', methods=['POST'])
+@manager.route('/datasets/<dataset_id>/documents/<document_id>/chunks', methods=['POST'])
 @token_required
 def add_chunk(tenant_id,dataset_id,document_id):
     if not KnowledgebaseService.query(id=dataset_id, tenant_id=tenant_id):
@@ -459,7 +455,7 @@ def add_chunk(tenant_id,dataset_id,document_id):
     embd_id = DocumentService.get_embd_id(document_id)
     embd_mdl = TenantLLMService.model_instance(
         tenant_id, LLMType.EMBEDDING.value, embd_id)
-
+    print(embd_mdl,flush=True)
     v, c = embd_mdl.encode([doc.name, req["content"]])
     v = 0.1 * v[0] + 0.9 * v[1]
     d["q_%d_vec" % len(v)] = v.tolist()
@@ -477,7 +473,7 @@ def add_chunk(tenant_id,dataset_id,document_id):
         "kb_id": "dataset_id",
         "create_timestamp_flt": "create_timestamp",
         "create_time": "create_time",
-        "document_keyword": "document",
+        "document_keyword": "document"
     }
     renamed_chunk = {}
     for key, value in d.items():
@@ -488,7 +484,7 @@ def add_chunk(tenant_id,dataset_id,document_id):
     # return get_result(data={"chunk_id": chunk_id})
 
 
-@manager.route('dataset/<dataset_id>/document/<document_id>/chunk', methods=['DELETE'])
+@manager.route('datasets/<dataset_id>/documents/<document_id>/chunks', methods=['DELETE'])
 @token_required
 def rm_chunk(tenant_id,dataset_id,document_id):
     if not KnowledgebaseService.query(id=dataset_id, tenant_id=tenant_id):
@@ -498,25 +494,31 @@ def rm_chunk(tenant_id,dataset_id,document_id):
         return get_error_data_result(retmsg=f"You don't own the document {document_id}.")
     doc = doc[0]
     req = request.json
-    if not req.get("chunk_ids"):
-        return get_error_data_result("`chunk_ids` is required")
     query = {
         "doc_ids": [doc.id], "page": 1, "size": 1024, "question": "", "sort": True}
     sres = retrievaler.search(query, search.index_name(tenant_id), highlight=True)
-    for chunk_id in req.get("chunk_ids"):
+    if not req:
+        chunk_ids=None
+    else:
+        chunk_ids=req.get("chunk_ids")
+    if not chunk_ids:
+        chunk_list=sres.ids
+    else:
+        chunk_list=chunk_ids
+    for chunk_id in chunk_list:
         if chunk_id not in sres.ids:
             return get_error_data_result(f"Chunk {chunk_id} not found")
     if not ELASTICSEARCH.deleteByQuery(
-            Q("ids", values=req["chunk_ids"]), search.index_name(tenant_id)):
+            Q("ids", values=chunk_list), search.index_name(tenant_id)):
         return get_error_data_result(retmsg="Index updating failure")
-    deleted_chunk_ids = req["chunk_ids"]
+    deleted_chunk_ids = chunk_list
     chunk_number = len(deleted_chunk_ids)
     DocumentService.decrement_chunk_num(doc.id, doc.kb_id, 1, chunk_number, 0)
     return get_result()
 
 
 
-@manager.route('/dataset/<dataset_id>/document/<document_id>/chunk/<chunk_id>', methods=['PUT'])
+@manager.route('/datasets/<dataset_id>/documents/<document_id>/chunks/<chunk_id>', methods=['PUT'])
 @token_required
 def update_chunk(tenant_id,dataset_id,document_id,chunk_id):
     try:
