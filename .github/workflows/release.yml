@@ -16,7 +16,8 @@ concurrency:
 
 jobs:
   release:
-    runs-on: [ "self-hosted", "overseas" ]
+    runs-on: 
+      group: ubuntu-runners
     steps:
       - name: Ensure workspace ownership
         run: echo "chown -R $USER $GITHUB_WORKSPACE" && sudo chown -R $USER $GITHUB_WORKSPACE
