@@ -65,9 +65,9 @@ const Login = () => {
     // wrapperCol: { span: 8 },
   };
 
-  const toGoogle = () => {
+  const toGitHub = () => {
     window.location.href =
-      'https://github.com/login/oauth/authorize?scope=user:email&client_id=302129228f0d96055bee';
+      'https://github.com/login/oauth/authorize?scope=user:email&client_id=Ov23liAMJTv1wrrIbSw6';
   };
 
   return (
@@ -156,28 +156,32 @@ const Login = () => {
                 {/* <Button
                   block
                   size="large"
-                  onClick={toGoogle}
+                  onClick={toGitHub}
                   style={{ marginTop: 15 }}
                 >
                   <div>
                     <Icon
-                      icon="local:google"
-                      style={{ verticalAlign: 'middle', marginRight: 5 }}
+                      icon="local:github"
+                      style={{ verticalAlign: 'middle', display: 'inline-block', marginRight: 5 }}
                     />
-                    Sign in with Google
+                    Sign in with GitHub
                   </div>
                 </Button> */}
                 {location.host === Domain && (
                   <Button
                     block
                     size="large"
-                    onClick={toGoogle}
+                    onClick={toGitHub}
                     style={{ marginTop: 15 }}
                   >
                     <div className="flex items-center">
                       <Icon
                         icon="local:github"
-                        style={{ verticalAlign: 'middle', marginRight: 5 }}
+                        style={{
+                          verticalAlign: 'middle',
+                          display: 'inline-block',
+                          marginRight: 5,
+                        }}
                       />
                       Sign in with GitHub
                     </div>
