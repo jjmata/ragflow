@@ -122,7 +122,7 @@ export enum FileMimeType {
   Json = 'application/json',
 }
 
-export const Domain = 'demo.ragflow.io';
+export const Domain = 'staging-labs.chancen-hq.org';
 
 //#region file preview
 export const Images = [

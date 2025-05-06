@@ -179,7 +179,7 @@ const Login = () => {
                         icon="local:github"
                         style={{ verticalAlign: 'middle', marginRight: 5 }}
                       />
-                      Sign in with Github
+                      Sign in with GitHub
                     </div>
                   </Button>
                 )}
