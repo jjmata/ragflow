@@ -71,12 +71,12 @@ jobs:
       # check on space
       - run: df -h
 
-      - name: Build ragflow:nightly
-        run: |
-          sudo docker build --progress=plain --build-arg NEED_MIRROR=1 -f Dockerfile -t jjmata/ragflow:nightly .
-
+      # - name: Build ragflow:nightly
+      #   run: |
+      #     sudo docker build --progress=plain --build-arg NEED_MIRROR=1 -f Dockerfile -t jjmata/ragflow:nightly .
+      #
       # check on space
-      - run: df -h
+      # - run: df -h
 
       - name: Start ragflow:nightly-slim
         run: |
