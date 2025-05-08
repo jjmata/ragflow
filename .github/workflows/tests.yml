@@ -95,6 +95,7 @@ jobs:
 
       - name: Run sdk tests against Elasticsearch
         run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
           export http_proxy=""; export https_proxy=""; export no_proxy=""; export HTTP_PROXY=""; export HTTPS_PROXY=""; export NO_PROXY=""
           export HOST_ADDRESS=http://host.docker.internal:9380
           until sudo docker exec ragflow-server curl -s --connect-timeout 5 ${HOST_ADDRESS} > /dev/null; do
