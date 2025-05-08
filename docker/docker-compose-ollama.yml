@@ -32,7 +32,7 @@ services:
       - OLLAMA_BASE_URL=http://ollama:11434/
       - ENABLE_SIGNUP=False
       - WEBUI_AUTH=False
-      - WEBUI_NAME=Boring Jobs
+      - WEBUI_NAME=ChancenAI Open WebUI
       - WEBUI_URL=http://localhost:3000
       - WEBUI_SECRET_KEY=b0ring-j0bs
     extra_hosts:
