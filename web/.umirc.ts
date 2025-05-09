@@ -20,6 +20,12 @@ export default defineConfig({
   history: {
     type: 'browser',
   },
+  define: {
+    'process.env.REACT_APP_PUBLIC_POSTHOG_KEY':
+      process.env.REACT_APP_PUBLIC_POSTHOG_KEY,
+    'process.env.REACT_APP_PUBLIC_POSTHOG_HOST':
+      process.env.REACT_APP_PUBLIC_POSTHOG_HOST,
+  },
   plugins: [
     '@react-dev-inspector/umi4-plugin',
     '@umijs/plugins/dist/tailwindcss',
