@@ -104,7 +104,8 @@
     "unist-util-visit-parents": "^6.0.1",
     "uuid": "^9.0.1",
     "zod": "^3.23.8",
-    "zustand": "^4.5.2"
+    "zustand": "^4.5.2",
+    "posthog-js": "^1.112.0"
   },
   "devDependencies": {
     "@react-dev-inspector/umi4-plugin": "^2.0.1",

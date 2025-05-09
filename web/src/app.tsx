@@ -22,6 +22,24 @@ import { ThemeProvider, useTheme } from './components/theme-provider';
 import { SidebarProvider } from './components/ui/sidebar';
 import { TooltipProvider } from './components/ui/tooltip';
 import storage from './utils/authorization-util';
+import ReactDOM from 'react-dom/client';
+import { PostHogProvider} from 'posthog-js/react'
+
+const options = {
+  api_host: process.env.REACT_APP_PUBLIC_POSTHOG_HOST,
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <PostHogProvider 
+      apiKey={process.env.REACT_APP_PUBLIC_POSTHOG_KEY}
+      options={options}
+    >
+      <App />
+    </PostHogProvider>
+  </React.StrictMode>
+);
 
 dayjs.extend(customParseFormat);
 dayjs.extend(advancedFormat);
