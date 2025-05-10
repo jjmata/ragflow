@@ -103,3 +103,5 @@ redis:
 #   switch: false
 #   component: false
 #   dataset: false
+# TODO: add PostHog configs and propagate config to React app
+ 
