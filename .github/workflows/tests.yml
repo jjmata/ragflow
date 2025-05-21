@@ -5,9 +5,6 @@ on:
     branches:
       - 'chancen'
       - '*.*.*'
-      - 'fix-nightly-builds'
-    tags:
-      - 'nightly'
     paths-ignore:
       - 'docs/**'
       - '*.md'
@@ -71,6 +68,7 @@ jobs:
           sudo docker pull ubuntu:22.04
           sudo docker build --progress=plain --build-arg LIGHTEN=1 --build-arg NEED_MIRROR=1 -f Dockerfile -t jjmata/ragflow:nightly-slim .
 
+      # check on space
       - run: df -h
 
       # - name: Build ragflow:nightly
@@ -85,8 +83,6 @@ jobs:
           echo -e "\nRAGFLOW_IMAGE=jjmata/ragflow:nightly-slim" >> docker/.env
           sudo docker compose -f docker/docker-compose.yml up -d
 
-      - run: df -h
-
       # - name: Stop ragflow:nightly-slim
       #   if: always()  # always run this step even if previous steps failed
       #   run: |
@@ -96,11 +92,12 @@ jobs:
       #  run: |
       #    echo -e "\nRAGFLOW_IMAGE=jjmata/ragflow:nightly" >> docker/.env
       #    sudo docker compose -f docker/docker-compose.yml up -d
+
       - name: Run sdk tests against Elasticsearch
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           export http_proxy=""; export https_proxy=""; export no_proxy=""; export HTTP_PROXY=""; export HTTPS_PROXY=""; export NO_PROXY=""
-          export HOST_ADDRESS=http://host.docker.internal:9380
+          export HOST_ADDRESS=http://localhost:9380
           until sudo docker exec ragflow-server curl -s --connect-timeout 5 ${HOST_ADDRESS} > /dev/null; do
             echo "Waiting for service to be available..."
             sleep 5
@@ -110,7 +107,7 @@ jobs:
       - name: Run frontend api tests against Elasticsearch
         run: |
           export http_proxy=""; export https_proxy=""; export no_proxy=""; export HTTP_PROXY=""; export HTTPS_PROXY=""; export NO_PROXY=""
-          export HOST_ADDRESS=http://host.docker.internal:9380
+          export HOST_ADDRESS=http://localhost:9380
           until sudo docker exec ragflow-server curl -s --connect-timeout 5 ${HOST_ADDRESS} > /dev/null; do
             echo "Waiting for service to be available..."
             sleep 5
@@ -120,7 +117,7 @@ jobs:
       - name: Run http api tests against Elasticsearch
         run: |
           export http_proxy=""; export https_proxy=""; export no_proxy=""; export HTTP_PROXY=""; export HTTPS_PROXY=""; export NO_PROXY=""
-          export HOST_ADDRESS=http://host.docker.internal:9380
+          export HOST_ADDRESS=http://localhost:9380
           until sudo docker exec ragflow-server curl -s --connect-timeout 5 ${HOST_ADDRESS} > /dev/null; do
             echo "Waiting for service to be available..."
             sleep 5
