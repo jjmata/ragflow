@@ -5,6 +5,7 @@ on:
     branches:
       - 'chancen'
       - '*.*.*'
+      - 'fix-nightly-builds'
     paths-ignore:
       - 'docs/**'
       - '*.md'
