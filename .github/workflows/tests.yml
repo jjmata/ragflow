@@ -5,6 +5,8 @@ on:
     branches:
       - 'chancen'
       - '*.*.*'
+    tags:
+      - 'nightly' # This line is added
     paths-ignore:
       - 'docs/**'
       - '*.md'
