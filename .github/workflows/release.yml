@@ -92,25 +92,25 @@ jobs:
       - run: df -h
 
       # https://github.com/marketplace/actions/build-and-push-docker-images
-      # - name: Build and push full image
-      #   uses: docker/build-push-action@v6
-      #   with:
-      #     context: .
-      #     push: true
-      #     tags: jjmata/ragflow:${{ env.RELEASE_TAG }}
-      #     file: Dockerfile
-      #     platforms: linux/amd64
-
-      # https://github.com/marketplace/actions/build-and-push-docker-images
-      - name: Build and push slim image
+      - name: Build and push full image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: jjmata/ragflow:${{ env.RELEASE_TAG }}-slim
+          tags: jjmata/ragflow:${{ env.RELEASE_TAG }}
           file: Dockerfile
-          build-args: LIGHTEN=1
           platforms: linux/amd64
+
+      # https://github.com/marketplace/actions/build-and-push-docker-images
+      # - name: Build and push slim image
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: .
+      #     push: true
+      #     tags: jjmata/ragflow:${{ env.RELEASE_TAG }}-slim
+      #     file: Dockerfile
+      #     build-args: LIGHTEN=1
+      #     platforms: linux/amd64
 
       - name: Build ragflow-sdk
         if: startsWith(github.ref, 'refs/tags/v')

@@ -65,11 +65,11 @@ jobs:
           sudo docker builder prune -a
       - run: df -h
 
-      - name: Build ragflow:nightly-slim
+      - name: Build ragflow:nightly (full image)
         run: |
           RUNNER_WORKSPACE_PREFIX=${RUNNER_WORKSPACE_PREFIX:-$HOME}
           sudo docker pull ubuntu:22.04
-          sudo docker build --progress=plain --build-arg LIGHTEN=1 --build-arg NEED_MIRROR=1 -f Dockerfile -t jjmata/ragflow:nightly-slim .
+          sudo docker build --progress=plain --build-arg NEED_MIRROR=1 -f Dockerfile -t jjmata/ragflow:nightly .
 
       # check on space
       - run: df -h
@@ -81,9 +81,9 @@ jobs:
       # check on space
       # - run: df -h
 
-      - name: Start ragflow:nightly-slim
+      - name: Start ragflow:nightly (full image)
         run: |
-          echo -e "\nRAGFLOW_IMAGE=jjmata/ragflow:nightly-slim" >> docker/.env
+          echo -e "\nRAGFLOW_IMAGE=jjmata/ragflow:nightly" >> docker/.env
           sudo docker compose -f docker/docker-compose.yml up -d
 
       # - name: Stop ragflow:nightly-slim
@@ -175,7 +175,7 @@ jobs:
       #     sudo DOC_ENGINE=infinity docker compose -f docker/docker-compose.yml down -v
 
 
-      - name: Stop ragflow:nightly-slim
+      - name: Stop ragflow:nightly (full image)
         if: always()  # always run this step even if previous steps failed
         run: |
           df -h
