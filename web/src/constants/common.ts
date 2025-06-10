@@ -122,7 +122,7 @@ export enum FileMimeType {
   Json = 'application/json',
 }
 
-export const Domain = 'ai.chancen.tech';
+export const Domain = 'ai.chancen.tech:8080';
 
 //#region file preview
 export const Images = [
